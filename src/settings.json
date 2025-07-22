@@ -1,6 +1,6 @@
 {
-  "name": "Rynn Api's",
-  "version": "Rynn UI",
+  "name": "Xeyyzu Api's",
+  "version": "Xeyyzu UI",
   "description": "Simple and Easy-to-Use API Documentation",
   "header": {
     "status": "Online!",
@@ -14,12 +14,12 @@
     }
   },
   "apiSettings": {
-    "creator": "Rynn"
+    "creator": "Xeyyzu."
   },
   "links": [
     {
       "name": "Source Code",
-      "url": "https://github.com/rynxzyy/Rynn-UI"
+      "url": "https://github.com/xeyyzuV2/Xeyyzu-UI"
     },
     {
       "name": "Contact Me",

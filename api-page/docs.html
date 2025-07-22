@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xeyyzu APIs</title>
+    <link rel="icon" href="/src/icon.png" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style1.css">
+    <style>
+        /* Basic Navbar styling */
+        .navbar {
+            background-color: #333;
+            overflow: hidden;
+            padding: 10px 0;
+            text-align: center;
+        }
+        .navbar a {
+            color: white;
+            padding: 14px 20px;
+            text-decoration: none;
+            font-size: 17px;
+        }
+        .navbar a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="/">Home</a>
+        <a href="/docs">Docs</a>
+        <a href="/changelog">Changelog</a>
+    </nav>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <h1 class="logo">Xeyyzu APIs</h1>
+                <!-- <nav class="nav">
+                    <a href="dashboard.html" class="btn-primary">Go to Dashboard</a>
+                </nav> -->
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Hero Section -->
+            <section class="hero">
+                <div class="hero-content">
+                    <h1 class="hero-title">Xeyyzu APIs Based</h1>
+                    <p class="hero-description">
+                        A minimal tool to test, explore, and document your APIs. 
+                        No setup required - just start testing.
+                    </p>
+                    <div class="hero-actions">
+                        <a href="dashboard.html" class="btn-primary btn-large">Start Testing APIs</a>
+                        <a href="#features" class="btn-secondary">Learn More</a>
+                    </div>
+                </div>
+                <div class="hero-demo">
+                    <div class="demo-card">
+                        <div class="demo-header">
+                            <span class="demo-method">GET</span>
+                            <span class="demo-url">/api/users</span>
+                        </div>
+                        <div class="demo-response">
+                            <div class="response-status">
+                                <span class="status-code">200</span>
+                                <span class="status-text">OK</span>
+                            </div>
+                            <div class="response-body">
+                                <code>{"users": [...]}</code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Features Section -->
+            <section id="features" class="features">
+                <h2 class="section-title">Core Features</h2>
+                <div class="features-grid">
+                    <div class="feature">
+                        <div class="feature-icon">⚡</div>
+                        <h3 class="feature-title">Fast Testing</h3>
+                        <p class="feature-description">Test any API endpoint instantly without complex setup.</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">📊</div>
+                        <h3 class="feature-title">Clear Results</h3>
+                        <p class="feature-description">Get formatted responses with status codes and headers.</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">🔍</div>
+                        <h3 class="feature-title">Easy Search</h3>
+                        <p class="feature-description">Search and organize your API endpoints efficiently.</p>
+                    </div>
+                    <div class="feature">
+                        <div class="feature-icon">💾</div>
+                        <h3 class="feature-title">Save History</h3>
+                        <p class="feature-description">Keep track of your API tests and responses.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CTA Section -->
+            <section class="cta">
+                <div class="cta-content">
+                    <h2 class="cta-title">Ready to Test Your APIs?</h2>
+                    <p class="cta-description">Get started in seconds. No registration required.</p>
+                    <a href="dashboard.html" class="btn-primary btn-large">Open Dashboard</a>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p class="footer-text">Xeyyzu APIs Based. All Right reserved</p>
+                <p class="footer-year">© iCeoStore 2025</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Simple smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
