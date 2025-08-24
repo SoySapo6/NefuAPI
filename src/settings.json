@@ -1,6 +1,6 @@
 {
-  "name": "Rynn Api's",
-  "version": "Rynn UI",
+  "name": "JunzzXD シ゚ Api's",
+  "version": "Junzz 1.0.0",
   "description": "Simple and Easy-to-Use API Documentation",
   "header": {
     "status": "Online!",
@@ -14,16 +14,16 @@
     }
   },
   "apiSettings": {
-    "creator": "Rynn"
+    "creator": "JunzzXD シ゚"
   },
   "links": [
     {
       "name": "Source Code",
-      "url": "https://github.com/rynxzyy/Rynn-UI"
+      "url": "https://github.com/Juna201"
     },
     {
       "name": "Contact Me",
-      "url": "https://wa.me/6285173370004"
+      "url": "https://wa.me/6281264279690"
     }
   ],
   "categories": [
