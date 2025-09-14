@@ -1,11 +1,11 @@
 {
-  "name": "Rynn Api's",
-  "version": "Rynn UI",
+  "name": "Shiny Apis",
+  "version": "Shiny Apis",
   "description": "Simple and Easy-to-Use API Documentation",
   "header": {
     "status": "Online!",
     "imageSrc": [
-      "https://media4.giphy.com/media/l0Iy33dWjmywkCnNS/giphy.gif?cid=6c09b952p3mt40j1mgznfi9rwwtccbjl7mtc2kvfugymeinr&ep=v1_internal_gif_by_id&rid=giphy.gif&ct=g"
+      "https://qu.ax/nDPDF.png"
     ],
     "imageSize": {
       "mobile": "80%",

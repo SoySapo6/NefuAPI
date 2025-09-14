@@ -1,8 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
 body {
     font-family: 'Poppins', sans-serif;
     color: #4B4B4B;
     padding: 50px 30px;
     padding-top: 100px;
+    background-color: #f9fafb;
+    animation: fadeInAnimation ease 1s;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+}
+
+@keyframes fadeInAnimation {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+     }
 }
 
 body.no-scroll {
@@ -17,11 +32,13 @@ body.no-scroll {
     left: 0;
     right: 0;
     z-index: 100;
-    transition: box-shadow 0.3s ease;
+    transition: box-shadow 0.3s ease, background-color 0.3s ease;
 }
 
 .navbar.scrolled {
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
 }
 
 .navbar-brand {
@@ -46,13 +63,17 @@ body.no-scroll {
 }
 
 .modal-content {
-    padding: 10px;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: none;
 }
 
 .modal-dialog {
     margin: 20px;
     max-width: 100%;
     max-height: 80vh;
+    transition: all 0.3s ease;
 }
 
 .modal-body {
@@ -61,19 +82,24 @@ body.no-scroll {
 }
 
 #apiQueryInputContainer input, #searchInput {
-    transition: outline 0.3s ease;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
 }
 
 #apiQueryInputContainer input:focus, #searchInput:focus {
-    outline: 3px solid #333 !important;
-    border: none;
-    box-shadow: none;
+    outline: none;
+    border-color: #333;
+    box-shadow: 0 0 0 3px rgba(51, 51, 51, 0.1);
 }
 
 #apiResponseContent, #apiEndpoint {
-    font-family: monospace;
+    font-family: 'Fira Code', monospace;
     white-space: pre-wrap;
     word-wrap: break-word;
+    background-color: #f1f3f5 !important;
+    border-radius: 8px;
+    padding: 15px;
 }
 
 #apiResponseContent::-webkit-scrollbar {
@@ -81,9 +107,20 @@ body.no-scroll {
 }
 
 #apiLinks a {
-    display: block;
-    text-decoration: underline;
-    margin-bottom: 0.3rem;
+    display: inline-block;
+    text-decoration: none;
+    margin-bottom: 0.5rem;
+    margin-right: 1rem;
+    color: #333;
+    background-color: #e9ecef;
+    padding: 5px 15px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+#apiLinks a:hover {
+    background-color: #dee2e6;
+    transform: translateY(-2px);
 }
 
 #loadingScreen {
@@ -109,33 +146,50 @@ body.no-scroll {
 }
 
 #name {
-    font-size: 32px;
+    font-size: 42px;
     line-height: 1;
     z-index: 2;
+    font-weight: 600;
 }
 
 #version {
     background-color: #333;
     color: white;
-    padding: 5px 12px;
-    font-size: 11px;
+    padding: 6px 15px;
+    font-size: 12px;
     border-radius: 100px;
     white-space: nowrap;
+    margin-left: 15px;
 }
 
 .spinner-wrapper {
     text-align: center;
 }
 
+.api-item {
+    transition: all 0.3s ease;
+}
+
+.api-item:hover {
+    transform: translateY(-5px);
+}
+
 .hero-section {
     padding: 20px 25px;
-    background-color: #F8F9FA;
+    background-color: #fff;
     color: #333;
-    border-radius: 10px;
+    border-radius: 15px;
     height: 80px;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
+}
+
+.hero-section:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    border-color: transparent;
 }
 
 .hero-section > div {
@@ -143,7 +197,7 @@ body.no-scroll {
 }
 
 .hero-section .text-muted {
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
@@ -153,8 +207,9 @@ body.no-scroll {
 }
 
 .lead {
-    font-size: 15px;
-    color: #666;
+    font-size: 16px;
+    color: #555;
+    max-width: 800px;
 }
 
 .btn-dark {
@@ -162,7 +217,15 @@ body.no-scroll {
     color: #fff;
     border: none;
     border-radius: 8px;
-    padding: 8px 20px;
+    padding: 10px 22px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-dark:hover {
+    background-color: #000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .form-control.is-invalid {
@@ -175,21 +238,28 @@ body.no-scroll {
 
 .param-container .form-control:focus {
     border-color: #333;
-    box-shadow: 0 0 0 0.25rem rgba(51, 51, 51, 0.25);
+    box-shadow: 0 0 0 0.25rem rgba(51, 51, 51, 0.1);
+}
+
+.category-header {
+    font-weight: 600;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #e0e0e0;
+    margin-bottom: 20px !important;
 }
 
 @media screen and (min-width: 768px) {
     .modal-dialog {
-        padding: 180px;
+        padding: 10vh 10vw;
         max-width: 100%;
-        max-height: 60vh;
+        max-height: 80vh;
     }
 }
 
 @media screen and (min-width: 1200px) {
     .modal-dialog {
-        padding: 180px;
+        padding: 15vh 20vw;
         max-width: 100%;
-        max-height: 60vh;
+        max-height: 70vh;
     }
 }
