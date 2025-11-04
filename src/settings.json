@@ -1,11 +1,11 @@
 {
-  "name": "Rynn Api's",
-  "version": "Rynn UI",
-  "description": "Simple and Easy-to-Use API Documentation",
+  "name": "NefuAPI's",
+  "version": "1.0.1",
+  "description": "Todo lo que imaginas, un request de distancia.",
   "header": {
-    "status": "Online!",
+    "status": "OK",
     "imageSrc": [
-      "https://media4.giphy.com/media/l0Iy33dWjmywkCnNS/giphy.gif?cid=6c09b952p3mt40j1mgznfi9rwwtccbjl7mtc2kvfugymeinr&ep=v1_internal_gif_by_id&rid=giphy.gif&ct=g"
+      "https://files.catbox.moe/2334g9.png"
     ],
     "imageSize": {
       "mobile": "80%",
