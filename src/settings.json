@@ -14,7 +14,8 @@
     }
   },
   "apiSettings": {
-    "creator": "SoyMaycol"
+    "creator": "SoyMaycol",
+    "limit": "20"
   },
   "links": [
     {
