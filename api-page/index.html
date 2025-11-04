@@ -4,69 +4,915 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="/src/icon.png" type="image/png">
-    <title id="page"></title>
+    <title id="page">API Documentation</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"/>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap" rel="stylesheet"/>
-    <link rel="stylesheet" href="/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: #333;
+            background: #fff;
+            transition: margin-left 0.3s ease;
+        }
+
+        body.no-scroll {
+            overflow: hidden;
+        }
+
+        /* Loading Screen */
+        #loadingScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            animation: fadeOut 0.5s ease 2s forwards;
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                visibility: hidden;
+            }
+        }
+
+        .spinner-wrapper {
+            text-align: center;
+        }
+
+        .spinner-border {
+            border-color: #333;
+            border-right-color: transparent;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Top Bar */
+        .top-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: #fff;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 1000;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .top-bar.scrolled {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .menu-toggle {
+            width: 40px;
+            height: 40px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            padding: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .menu-toggle:hover {
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+
+        .menu-toggle span {
+            width: 24px;
+            height: 2px;
+            background: #333;
+            transition: all 0.3s ease;
+        }
+
+        .menu-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -7px);
+        }
+
+        .top-bar-title {
+            margin-left: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .top-bar-links {
+            margin-left: auto;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .top-bar-links a {
+            padding: 8px 16px;
+            background: #333;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .top-bar-links a:hover {
+            background: #000;
+            transform: translateY(-2px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 60px;
+            left: -280px;
+            width: 280px;
+            height: calc(100vh - 60px);
+            background: #fff;
+            border-right: 1px solid #e0e0e0;
+            overflow-y: auto;
+            transition: left 0.3s ease;
+            z-index: 999;
+            padding: 20px 0;
+        }
+
+        .sidebar.active {
+            left: 0;
+        }
+
+        .sidebar-category {
+            margin-bottom: 25px;
+        }
+
+        .sidebar-category h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0 20px;
+            margin-bottom: 10px;
+        }
+
+        .sidebar-item {
+            padding: 10px 20px;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 15px;
+        }
+
+        .sidebar-item:hover {
+            background: #f5f5f5;
+            padding-left: 25px;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 60px;
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+            transition: margin-left 0.3s ease;
+        }
+
+        body.sidebar-open .main-content {
+            margin-left: 280px;
+        }
+
+        .banner {
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            animation: fadeIn 0.8s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header-section {
+            margin-bottom: 30px;
+            animation: fadeIn 0.8s ease 0.2s backwards;
+        }
+
+        .title-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .title-container h1 {
+            font-size: 36px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .badge {
+            background: #333;
+            color: #fff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .description {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* Status Section */
+        .status-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            animation: fadeIn 0.8s ease 0.3s backwards;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .status-item {
+            text-align: center;
+        }
+
+        .status-item h4 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .status-item p {
+            font-size: 13px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Search Bar */
+        .search-container {
+            margin-bottom: 30px;
+            animation: fadeIn 0.8s ease 0.4s backwards;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 14px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        #searchInput:focus {
+            outline: none;
+            border-color: #333;
+            box-shadow: 0 0 0 3px rgba(51, 51, 51, 0.1);
+        }
+
+        /* API Items */
+        .category-section {
+            margin-bottom: 40px;
+            animation: fadeIn 0.8s ease 0.5s backwards;
+        }
+
+        .category-header {
+            font-size: 22px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .api-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .api-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .api-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+
+        .api-card-content {
+            flex: 1;
+        }
+
+        .api-card h5 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .api-card p {
+            font-size: 13px;
+            color: #666;
+            margin: 0;
+        }
+
+        .api-card button {
+            background: #333;
+            color: #fff;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .api-card button:hover {
+            background: #000;
+            transform: scale(1.05);
+        }
+
+        /* Modal */
+        .modal-content {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .modal-header {
+            border-bottom: 1px solid #e0e0e0;
+            padding: 20px 25px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .modal-desc {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .modal-body {
+            padding: 25px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .modal-footer {
+            border-top: 1px solid #e0e0e0;
+            padding: 15px 25px;
+        }
+
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 13px;
+            overflow-x: auto;
+        }
+
+        .param-container {
+            margin-top: 20px;
+        }
+
+        .param-container input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .param-container input:focus {
+            outline: none;
+            border-color: #333;
+            box-shadow: 0 0 0 3px rgba(51, 51, 51, 0.1);
+        }
+
+        .param-container input.is-invalid {
+            border-color: #dc3545;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: #999;
+            font-size: 14px;
+            border-top: 1px solid #e0e0e0;
+            margin-top: 60px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .top-bar-links a {
+                font-size: 0;
+                padding: 10px;
+            }
+            
+            .top-bar-links a::before {
+                content: '→';
+                font-size: 18px;
+            }
+
+            .title-container h1 {
+                font-size: 28px;
+            }
+
+            .api-grid {
+                grid-template-columns: 1fr;
+            }
+
+            body.sidebar-open .main-content {
+                margin-left: 0;
+            }
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 60px;
+            left: 0;
+            width: 100%;
+            height: calc(100vh - 60px);
+            background: rgba(0,0,0,0.5);
+            z-index: 998;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+    </style>
 </head>
 <body>
+    <!-- Loading Screen -->
     <div id="loadingScreen">
         <div class="spinner-wrapper">
-            <div class="spinner-border text-dark mb-2" role="status">
+            <div class="spinner-border mb-3" role="status" style="width: 3rem; height: 3rem;">
                 <span class="visually-hidden">Loading...</span>
             </div>
-            <p>Waitt...</p>
+            <p style="color: #666;">Loading...</p>
         </div>
     </div>
-    <nav class="navbar navbar-expand-lg navbar-light">
-        <div class="container">
-            <a class="navbar-brand" style="display: flex; align-items: center;">
-                <span id="header" class="me-2"></span>
-                <div id="versionHeader" style="background-color: #333; color: white; padding: 4px 12px; font-size: 12px; border-radius: 100px;"></div>
-            </a>
-        </div>
-    </nav>
-    <div class="container">
-        <img id="dynamicImage" class="banner mb-4" style="border-radius: 8px;" src="">
-        <div id="nameContainer" style="display: flex; align-items: center;">
-            <h1 id="name" style="font-size: 32px; margin-right: 10px;"></h1>
-            <div id="version" style="background-color: #333; color: white; padding: 5px 12px; font-size: 12px; border-radius: 100px;"></div>
-        </div>
-        <p id="description" class="lead mb-3"></p>
-        <div id="apiLinks" class="mb-5"></div>
-        <input type="text" id="searchInput" class="form-control mb-5" placeholder="Search API...">
-        <div class="tab-content" id="apiContent"></div>
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <button class="menu-toggle" id="menuToggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <div class="top-bar-title" id="topBarTitle"></div>
+        <div class="top-bar-links" id="topBarLinks"></div>
     </div>
-    <div class="modal fade" id="apiResponseModal" tabindex="-1" aria-labelledby="apiResponseModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" id="modalDialog">
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar"></div>
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <img class="banner" id="bannerImage" src="" alt="Banner">
+        
+        <div class="header-section">
+            <div class="title-container">
+                <h1 id="apiName"></h1>
+                <span class="badge" id="apiVersion"></span>
+            </div>
+            <p class="description" id="apiDescription"></p>
+        </div>
+
+        <div class="status-section" id="statusSection" style="display: none;">
+            <h3 style="margin-bottom: 15px; font-size: 18px;">API Status</h3>
+            <div class="status-grid" id="statusGrid"></div>
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search endpoints...">
+        </div>
+
+        <div id="apiContent"></div>
+
+        <div class="footer">
+            <p>Created by <strong id="creatorName"></strong></p>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="apiModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <div>
-                        <h5 class="modal-title" id="apiResponseModalLabel"></h5>
-                        <p class="modal-desc text-muted mb-0" id="apiResponseModalDesc" style="font-size: 14px;"></p>
+                        <h5 class="modal-title" id="modalTitle"></h5>
+                        <p class="modal-desc" id="modalDesc"></p>
                     </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <pre id="apiEndpoint" style="background-color: #f8f9fa; padding: 10px; border-radius: 5px;"></pre>
-                    <div id="apiQueryInputContainer"></div>
-                    <div id="apiResponseLoading" class="d-none d-flex justify-content-center align-items-center" style="height: 100px;">
-                        <div class="spinner-border custom-spinner" role="status">
+                    <pre id="apiEndpoint"></pre>
+                    <div id="paramContainer"></div>
+                    <div id="loadingSpinner" class="text-center" style="display: none;">
+                        <div class="spinner-border" role="status">
                             <span class="visually-hidden">Loading...</span>
                         </div>
                     </div>
-                    <pre id="apiResponseContent" class="d-none mt-2" style="background-color: #f8f9fa; padding: 10px; border-radius: 5px;"></pre>
+                    <pre id="apiResponse" style="display: none;"></pre>
                 </div>
                 <div class="modal-footer">
-                    <button id="submitQueryBtn" class="btn btn-dark">Submit</button>
+                    <button class="btn btn-dark" id="submitBtn" style="display: none;">Submit</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/script.js"></script>
+    <script>
+        let settings = {};
+        let modal;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const loadingScreen = document.getElementById('loadingScreen');
+            const body = document.body;
+            body.classList.add('no-scroll');
+
+            try {
+                settings = await fetch('/src/settings.json').then(res => res.json());
+                
+                // Set page title and header
+                document.getElementById('page').textContent = settings.name || 'API Docs';
+                document.getElementById('topBarTitle').textContent = settings.name || 'API Docs';
+                document.getElementById('apiName').textContent = settings.name || 'API Docs';
+                document.getElementById('apiVersion').textContent = settings.version || 'v1.0';
+                document.getElementById('apiDescription').textContent = settings.description || '';
+                document.getElementById('creatorName').textContent = settings.apiSettings?.creator || 'Unknown';
+
+                // Set banner image
+                const bannerImage = document.getElementById('bannerImage');
+                if (settings.header?.imageSrc && settings.header.imageSrc.length > 0) {
+                    const randomImage = settings.header.imageSrc[Math.floor(Math.random() * settings.header.imageSrc.length)];
+                    bannerImage.src = randomImage;
+                } else {
+                    bannerImage.style.display = 'none';
+                }
+
+                // Set top bar links
+                const topBarLinks = document.getElementById('topBarLinks');
+                if (settings.links && settings.links.length > 0) {
+                    settings.links.forEach(link => {
+                        const a = document.createElement('a');
+                        a.href = link.url;
+                        a.textContent = link.name;
+                        a.target = '_blank';
+                        topBarLinks.appendChild(a);
+                    });
+                }
+
+                // Load status
+                await loadStatus();
+
+                // Build sidebar
+                buildSidebar();
+
+                // Build API content
+                buildApiContent();
+
+                // Setup search
+                setupSearch();
+
+                // Setup menu toggle
+                setupMenuToggle();
+
+                // Setup scroll effect
+                window.addEventListener('scroll', () => {
+                    const topBar = document.querySelector('.top-bar');
+                    if (window.scrollY > 0) {
+                        topBar.classList.add('scrolled');
+                    } else {
+                        topBar.classList.remove('scrolled');
+                    }
+                });
+
+            } catch (error) {
+                console.error('Error loading settings:', error);
+            } finally {
+                setTimeout(() => {
+                    loadingScreen.style.display = 'none';
+                    body.classList.remove('no-scroll');
+                }, 2000);
+            }
+        });
+
+        async function loadStatus() {
+            try {
+                const response = await fetch('/status');
+                const data = await response.json();
+                
+                const statusSection = document.getElementById('statusSection');
+                const statusGrid = document.getElementById('statusGrid');
+                
+                statusSection.style.display = 'block';
+                
+                const statusItems = [
+                    { label: 'Status', value: 'Online' },
+                    { label: 'Version', value: data.creator || 'N/A' },
+                    { label: 'Total Requests', value: data.total_requests || 0 },
+                    { label: 'Active Users', value: data.active_users || 0 },
+                    { label: 'Daily Limit', value: data.daily_limit || 'N/A' },
+                    { label: 'Routes Loaded', value: data.routes_loaded || 0 },
+                    { label: 'Uptime', value: formatUptime(data.uptime_seconds) },
+                    { label: 'Latency', value: `${data.api_latency_ms || 0}ms` }
+                ];
+
+                statusGrid.innerHTML = statusItems.map(item => `
+                    <div class="status-item">
+                        <h4>${item.value}</h4>
+                        <p>${item.label}</p>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading status:', error);
+            }
+        }
+
+        function formatUptime(seconds) {
+            if (!seconds) return 'N/A';
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            return `${hours}h ${minutes}m`;
+        }
+
+        function buildSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            settings.categories.forEach(category => {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'sidebar-category';
+                
+                const categoryTitle = document.createElement('h3');
+                categoryTitle.textContent = category.name;
+                categoryDiv.appendChild(categoryTitle);
+
+                category.items.forEach(item => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'sidebar-item';
+                    itemDiv.textContent = item.name;
+                    itemDiv.onclick = () => {
+                        document.getElementById(`api-${item.name.replace(/\s+/g, '-')}`).scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        closeSidebar();
+                    };
+                    categoryDiv.appendChild(itemDiv);
+                });
+
+                sidebar.appendChild(categoryDiv);
+            });
+        }
+
+        function buildApiContent() {
+            const apiContent = document.getElementById('apiContent');
+            settings.categories.forEach(category => {
+                const categorySection = document.createElement('div');
+                categorySection.className = 'category-section';
+                categorySection.dataset.category = category.name;
+
+                const categoryHeader = document.createElement('h2');
+                categoryHeader.className = 'category-header';
+                categoryHeader.textContent = category.name;
+                categorySection.appendChild(categoryHeader);
+
+                const apiGrid = document.createElement('div');
+                apiGrid.className = 'api-grid';
+
+                category.items.sort((a, b) => a.name.localeCompare(b.name)).forEach(item => {
+                    const apiCard = document.createElement('div');
+                    apiCard.className = 'api-card';
+                    apiCard.id = `api-${item.name.replace(/\s+/g, '-')}`;
+                    apiCard.dataset.name = item.name.toLowerCase();
+                    apiCard.dataset.desc = item.desc.toLowerCase();
+                    
+                    apiCard.innerHTML = `
+                        <div class="api-card-content">
+                            <h5>${item.name}</h5>
+                            <p>${item.desc}</p>
+                        </div>
+                        <button onclick="openModal('${item.name}', '${item.desc}', '${item.path}', ${JSON.stringify(item.innerDesc || '').replace(/'/g, "&apos;")})">GET</button>
+                    `;
+
+                    apiGrid.appendChild(apiCard);
+                });
+
+                categorySection.appendChild(apiGrid);
+                apiContent.appendChild(categorySection);
+            });
+        }
+
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                const apiCards = document.querySelectorAll('.api-card');
+                const categories = document.querySelectorAll('.category-section');
+
+                apiCards.forEach(card => {
+                    const name = card.dataset.name;
+                    const desc = card.dataset.desc;
+                    const matches = name.includes(searchTerm) || desc.includes(searchTerm);
+                    card.style.display = matches ? '' : 'none';
+                });
+
+                categories.forEach(category => {
+                    const visibleCards = category.querySelectorAll('.api-card:not([style*="display: none"])');
+                    category.style.display = visibleCards.length > 0 ? '' : 'none';
+                });
+            });
+        }
+
+        function setupMenuToggle() {
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            const body = document.body;
+
+            menuToggle.addEventListener('click', () => {
+                menuToggle.classList.toggle('active');
+                sidebar.classList.toggle('active');
+                overlay.classList.toggle('active');
+                body.classList.toggle('sidebar-open');
+            });
+
+            overlay.addEventListener('click', closeSidebar);
+        }
+
+        function closeSidebar() {
+            document.getElementById('menuToggle').classList.remove('active');
+            document.getElementById('sidebar').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+            document.body.classList.remove('sidebar-open');
+        }
+
+        function openModal(name, desc, path, innerDesc) {
+            if (!modal) {
+                modal = new bootstrap.Modal(document.getElementById('apiModal'));
+            }
+
+            document.getElementById('modalTitle').textContent = name;
+            document.getElementById('modalDesc').textContent = desc;
+            document.getElementById('apiEndpoint').textContent = '';
+            document.getElementById('paramContainer').innerHTML = '';
+            document.getElementById('apiResponse').style.display = 'none';
+            document.getElementById('loadingSpinner').style.display = 'none';
+            document.getElementById('submitBtn').style.display = 'none';
+
+            const params = new URLSearchParams(path.split('?')[1]);
+            const hasParams = params.toString().length > 0;
+
+            if (hasParams) {
+                const paramContainer = document.getElementById('paramContainer');
+                const paramsArray = Array.from(params.keys());
+
+                paramsArray.forEach(param => {
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.placeholder = `Enter ${param}...`;
+                    input.dataset.param = param;
+                    input.required = true;
+                    paramContainer.appendChild(input);
+                });
+
+                if (innerDesc) {
+                    const descDiv = document.createElement('div');
+                    descDiv.style.fontSize = '13px';
+                    descDiv.style.color = '#666';
+                    descDiv.style.marginTop = '10px';
+                    descDiv.innerHTML = innerDesc.replace(/\n/g, '<br>');
+                    paramContainer.appendChild(descDiv);
+                }
+
+                document.getElementById('submitBtn').style.display = 'block';
+                document.getElementById('submitBtn').onclick = () => {
+                    const inputs = paramContainer.querySelectorAll('input');
+                    const newParams = new URLSearchParams();
+                    let isValid = true;
+
+                    inputs.forEach(input => {
+                        if (!input.value.trim()) {
+                            isValid = false;
+                            input.classList.add('is-invalid');
+                        } else {
+                            input.classList.remove('is-invalid');
+                            newParams.append(input.dataset.param, input.value.trim());
+                        }
+                    });
+
+                    if (isValid) {
+                        const apiUrl = `${window.location.origin}${path.split('?')[0]}?${newParams.toString()}`;
+                        makeApiRequest(apiUrl);
+                    }
+                };
+            } else {
+                const apiUrl = `${window.location.origin}${path}`;
+                makeApiRequest(apiUrl);
+            }
+
+            modal.show();
+        }
+
+        async function makeApiRequest(url) {
+            document.getElementById('apiEndpoint').textContent = url;
+            document.getElementById('loadingSpinner').style.display = 'block';
+            document.getElementById('apiResponse').style.display = 'none';
+            document.getElementById('paramContainer').innerHTML = '';
+            document.getElementById('submitBtn').style.display = 'none';
+
+            try {
+                const response = await fetch(url);
+                const contentType = response.headers.get('Content-Type');
+
+                if (contentType && contentType.startsWith('image/')) {
+                    const blob = await response.blob();
+                    const imageUrl = URL.createObjectURL(blob);
+                    const img = document.createElement('img');
+                    img.src = imageUrl;
+                    img.style.maxWidth = '100%';
+                    img.style.borderRadius = '8px';
+                    
+                    const responseDiv = document.getElementById('apiResponse');
+                    responseDiv.innerHTML = '';
+                    responseDiv.appendChild(img);
+                    responseDiv.style.display = 'block';
+                } else {
+                    const data = await response.json();
+                    document.getElementById('apiResponse').textContent = JSON.stringify(data, null, 2);
+                    document.getElementById('apiResponse').style.display = 'block';
+                }
+            } catch (error) {
+                document.getElementById('apiResponse').textContent = `Error: ${error.message}`;
+                document.getElementById('apiResponse').style.display = 'block';
+            } finally {
+                document.getElementById('loadingSpinner').style.display = 'none';
+            }
+        }
+    </script>
 </body>
 </html>
