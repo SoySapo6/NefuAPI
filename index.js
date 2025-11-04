@@ -3,6 +3,8 @@ const chalk = require('chalk');
 const fs = require('fs');
 const cors = require('cors');
 const path = require('path');
+const os = require('os');
+const axios = require('axios');
 
 const app = express();
 const PORT = process.env.PORT || 10005;
@@ -22,8 +24,8 @@ let requestCount = 0;
 const apiStartTime = Date.now();
 const userRequests = {};
 
-app.use((req, res, next) => {
-    const ip = req.ip;
+app.use(async (req, res, next) => {
+    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.ip;
     const currentDate = new Date().toISOString().split('T')[0];
     if (!userRequests[ip]) userRequests[ip] = {};
     if (userRequests[ip].date !== currentDate) {
@@ -77,8 +79,26 @@ fs.readdirSync(apiFolder).forEach((subfolder) => {
 console.log(chalk.bgHex('#90EE90').hex('#333').bold(' Load Complete! ✓ '));
 console.log(chalk.bgHex('#90EE90').hex('#333').bold(` Total Routes Loaded: ${totalRoutes} `));
 
-app.get('/status', (req, res) => {
+app.get('/status', async (req, res) => {
     const uptime = ((Date.now() - apiStartTime) / 1000).toFixed(0);
+    const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.ip;
+    let geo = {};
+    try {
+        const ipData = await axios.get(`https://ipapi.co/${ip}/json/`);
+        geo = ipData.data;
+    } catch (e) {
+        geo = { error: "Geo data unavailable" };
+    }
+
+    const cpuInfo = os.cpus()[0];
+    const totalMem = (os.totalmem() / 1024 / 1024 / 1024).toFixed(2);
+    const freeMem = (os.freemem() / 1024 / 1024 / 1024).toFixed(2);
+    const usedMem = (totalMem - freeMem).toFixed(2);
+    const disk = fs.statSync("/");
+    const platform = os.platform();
+    const arch = os.arch();
+    const hostname = os.hostname();
+
     res.json({
         creator: settings.apiSettings.creator,
         uptime: `${uptime}s`,
@@ -86,7 +106,21 @@ app.get('/status', (req, res) => {
         routes_loaded: totalRoutes,
         daily_limit: settings.apiSettings.limit,
         active_users: Object.keys(userRequests).length,
-        current_date: new Date().toISOString()
+        current_date: new Date().toISOString(),
+        user_ip: ip,
+        user_geo: geo,
+        system: {
+            hostname,
+            platform,
+            arch,
+            cpu: cpuInfo.model,
+            cores: os.cpus().length,
+            cpu_speed: `${cpuInfo.speed} MHz`,
+            ram_total_gb: totalMem,
+            ram_used_gb: usedMem,
+            ram_free_gb: freeMem,
+            uptime_os_seconds: os.uptime()
+        }
     });
 });
 
