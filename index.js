@@ -48,7 +48,7 @@ app.use((req, res, next) => {
         if (data && typeof data === 'object') {
             const responseData = {
                 status: data.status,
-                creator: settings.apiSettings.creator || "Created Using Rynn UI",
+                creator: settings.apiSettings.creator || "SoyMaycol",
                 ...data
             };
             return originalJson.call(this, responseData);
