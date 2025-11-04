@@ -1,9 +1,9 @@
 {
   "name": "NefuAPI's",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Todo lo que imaginas, un request de distancia.",
   "header": {
-    "status": "OK",
+    "status": "ONLINE",
     "imageSrc": [
       "https://files.catbox.moe/wg9ysl.png"
     ],
