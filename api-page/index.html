@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="/src/icon.png" type="image/png">
-    <title id="page"></title>
+    <title id="pageTitle">API</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"/>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet"/>
     <style>
@@ -32,161 +32,160 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: #ffffff;
-            z-index: 9999;
+            background: #ffffff;
+            z-index: 10000;
             display: flex;
             justify-content: center;
             align-items: center;
             flex-direction: column;
-            animation: fadeOut 0.5s ease 2s forwards;
+            transition: opacity 0.5s ease;
         }
 
-        @keyframes fadeOut {
-            to {
-                opacity: 0;
-                visibility: hidden;
-            }
-        }
-
-        .spinner-wrapper {
-            text-align: center;
+        #loadingScreen.fade-out {
+            opacity: 0;
         }
 
         .spinner-border {
             width: 3rem;
             height: 3rem;
-            border-width: 0.3em;
-            color: #2c2c2c;
+            border: 3px solid #f0f0f0;
+            border-top-color: #2c2c2c;
         }
 
-        /* Top Navigation Bar */
-        .top-nav {
+        /* Top Bar */
+        .top-bar {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             height: 60px;
             background: #ffffff;
-            border-bottom: 1px solid #e0e0e0;
+            border-bottom: 1px solid #e5e5e5;
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 0 20px;
             z-index: 1000;
-            transition: box-shadow 0.3s ease;
+            transition: all 0.3s ease;
         }
 
-        .top-nav.scrolled {
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        .top-bar.scrolled {
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
 
-        .nav-brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 600;
-            font-size: 18px;
-            color: #2c2c2c;
-        }
-
-        .status-badge {
-            background: #2c2c2c;
-            color: #ffffff;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 500;
-        }
-
-        .nav-links {
+        .top-bar-left {
             display: flex;
             align-items: center;
             gap: 15px;
         }
 
-        .link-btn {
+        .menu-toggle {
+            width: 40px;
+            height: 40px;
             background: none;
             border: none;
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            padding: 0;
             transition: all 0.3s ease;
+        }
+
+        .menu-toggle:hover {
+            background: #f5f5f5;
+            border-radius: 5px;
+        }
+
+        .menu-toggle span {
+            display: block;
+            width: 22px;
+            height: 2px;
+            background: #2c2c2c;
+            transition: all 0.3s ease;
+        }
+
+        .menu-toggle.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .menu-toggle.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(7px, -6px);
+        }
+
+        .api-name {
+            font-size: 18px;
+            font-weight: 600;
             color: #2c2c2c;
         }
 
-        .link-btn:hover {
-            background: #f5f5f5;
-            transform: translateY(-2px);
-        }
-
-        .menu-btn {
-            background: #2c2c2c;
-            color: #ffffff;
-            border: none;
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
+        .top-bar-right {
             display: flex;
             align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            gap: 15px;
         }
 
-        .menu-btn:hover {
-            background: #1a1a1a;
-            transform: scale(1.05);
-        }
-
-        .menu-icon {
+        .top-links {
             display: flex;
-            flex-direction: column;
-            gap: 4px;
+            gap: 20px;
+            align-items: center;
         }
 
-        .menu-icon span {
-            width: 18px;
-            height: 2px;
-            background: #ffffff;
-            border-radius: 2px;
+        .top-link {
+            color: #2c2c2c;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
             transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .top-link:hover {
+            color: #666;
+        }
+
+        .link-icon {
+            width: 16px;
+            height: 16px;
         }
 
         /* Sidebar */
         .sidebar {
             position: fixed;
             top: 60px;
-            right: -300px;
+            left: -280px;
             width: 280px;
             height: calc(100vh - 60px);
             background: #ffffff;
-            border-left: 1px solid #e0e0e0;
-            z-index: 999;
-            transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-right: 1px solid #e5e5e5;
             overflow-y: auto;
-            padding: 20px;
+            transition: left 0.3s ease;
+            z-index: 999;
         }
 
         .sidebar.active {
-            right: 0;
-            box-shadow: -5px 0 20px rgba(0,0,0,0.1);
+            left: 0;
         }
 
         .sidebar-overlay {
             position: fixed;
             top: 60px;
             left: 0;
-            right: 0;
-            bottom: 0;
+            width: 100%;
+            height: calc(100vh - 60px);
             background: rgba(0,0,0,0.3);
-            z-index: 998;
             opacity: 0;
             visibility: hidden;
             transition: all 0.3s ease;
+            z-index: 998;
         }
 
         .sidebar-overlay.active {
@@ -194,41 +193,36 @@
             visibility: visible;
         }
 
-        .sidebar-section {
-            margin-bottom: 30px;
-        }
-
-        .sidebar-title {
-            font-size: 12px;
-            font-weight: 600;
-            color: #888;
-            text-transform: uppercase;
-            margin-bottom: 12px;
-            letter-spacing: 0.5px;
+        .sidebar-nav {
+            padding: 20px 0;
         }
 
         .sidebar-item {
-            padding: 12px 16px;
-            margin-bottom: 6px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 14px;
+            padding: 12px 20px;
             color: #2c2c2c;
-            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+            font-size: 14px;
+            font-weight: 500;
         }
 
         .sidebar-item:hover {
-            background: #2c2c2c;
-            color: #ffffff;
-            transform: translateX(-4px);
+            background: #f5f5f5;
         }
 
         .sidebar-item.active {
-            background: #2c2c2c;
-            color: #ffffff;
-            border-color: #2c2c2c;
+            background: #f5f5f5;
+            border-left-color: #2c2c2c;
+        }
+
+        .sidebar-category {
+            padding: 20px 20px 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         /* Main Content */
@@ -238,324 +232,265 @@
             max-width: 1200px;
             margin-left: auto;
             margin-right: auto;
-            min-height: calc(100vh - 60px);
+            min-height: calc(100vh - 120px);
         }
 
         /* Home Page */
         .home-banner {
             text-align: center;
-            margin-bottom: 50px;
-            animation: fadeInUp 0.6s ease;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            padding: 40px 20px;
+            animation: fadeIn 0.6s ease;
         }
 
         .home-banner img {
-            max-width: 300px;
-            width: 100%;
+            max-width: 100%;
             height: auto;
-            border-radius: 12px;
+            border-radius: 10px;
             margin-bottom: 30px;
-            animation: float 6s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
         }
 
         .home-title {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-
-        .home-title h1 {
             font-size: 42px;
             font-weight: 600;
+            margin-bottom: 10px;
             color: #2c2c2c;
-            margin: 0;
         }
 
-        .version-badge {
+        .home-version {
+            display: inline-block;
             background: #2c2c2c;
             color: #ffffff;
             padding: 6px 16px;
             border-radius: 20px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
+            margin-bottom: 20px;
         }
 
         .home-description {
             font-size: 18px;
             color: #666;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
         }
 
+        /* Status Page */
         .status-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 20px;
-            margin-top: 40px;
-            animation: fadeIn 0.8s ease 0.3s both;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            margin-top: 30px;
+            animation: fadeIn 0.6s ease;
         }
 
         .status-card {
-            background: #f8f9fa;
-            padding: 25px;
-            border-radius: 12px;
-            border: 1px solid #e0e0e0;
+            background: #ffffff;
+            border: 1px solid #e5e5e5;
+            border-radius: 10px;
+            padding: 20px;
             transition: all 0.3s ease;
         }
 
         .status-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-            border-color: #2c2c2c;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transform: translateY(-2px);
         }
 
-        .status-label {
+        .status-card-title {
             font-size: 12px;
-            color: #888;
+            font-weight: 600;
+            color: #999;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
         }
 
-        .status-value {
+        .status-card-value {
             font-size: 24px;
             font-weight: 600;
             color: #2c2c2c;
         }
 
-        /* Endpoints Page */
-        .search-box {
-            position: relative;
-            margin-bottom: 40px;
-            animation: slideDown 0.5s ease;
+        .status-card-small {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
         }
 
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        /* Endpoints Page */
+        .search-box {
+            margin-bottom: 30px;
+            animation: fadeIn 0.6s ease;
         }
 
         .search-input {
             width: 100%;
-            padding: 16px 50px 16px 20px;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            font-size: 16px;
+            padding: 14px 20px;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            font-size: 15px;
             transition: all 0.3s ease;
-            background: #ffffff;
+            font-family: 'Poppins', sans-serif;
         }
 
         .search-input:focus {
             outline: none;
             border-color: #2c2c2c;
-            box-shadow: 0 0 0 4px rgba(44, 44, 44, 0.1);
-        }
-
-        .search-icon {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #888;
+            box-shadow: 0 0 0 3px rgba(44,44,44,0.1);
         }
 
         .category-section {
-            margin-bottom: 50px;
-            animation: fadeInUp 0.6s ease;
+            margin-bottom: 40px;
+            animation: fadeIn 0.6s ease;
         }
 
         .category-title {
-            font-size: 26px;
+            font-size: 22px;
             font-weight: 600;
             color: #2c2c2c;
-            margin-bottom: 25px;
-            padding-bottom: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
             border-bottom: 2px solid #2c2c2c;
         }
 
         .endpoints-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
         }
 
         .endpoint-card {
-            background: #f8f9fa;
-            padding: 25px;
-            border-radius: 12px;
-            border: 1px solid #e0e0e0;
+            background: #ffffff;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 20px;
             display: flex;
-            flex-direction: column;
             justify-content: space-between;
+            align-items: center;
             transition: all 0.3s ease;
-            min-height: 140px;
         }
 
         .endpoint-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
-            border-color: #2c2c2c;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            transform: translateY(-2px);
         }
 
-        .endpoint-info h5 {
-            font-size: 18px;
+        .endpoint-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .endpoint-name {
+            font-size: 16px;
             font-weight: 600;
             color: #2c2c2c;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
 
-        .endpoint-info p {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 15px;
+        .endpoint-desc {
+            font-size: 13px;
+            color: #999;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
-        .get-btn {
+        .endpoint-btn {
             background: #2c2c2c;
             color: #ffffff;
             border: none;
-            padding: 10px 24px;
-            border-radius: 8px;
-            font-size: 14px;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-size: 13px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
-            align-self: flex-start;
+            white-space: nowrap;
+            margin-left: 15px;
         }
 
-        .get-btn:hover {
+        .endpoint-btn:hover {
             background: #1a1a1a;
             transform: scale(1.05);
         }
 
         /* Modal */
         .modal-content {
-            border-radius: 16px;
             border: none;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
         }
 
         .modal-header {
-            border-bottom: 1px solid #e0e0e0;
-            padding: 25px;
+            border-bottom: 1px solid #e5e5e5;
+            padding: 20px 24px;
         }
 
         .modal-title {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 600;
             color: #2c2c2c;
         }
 
         .modal-desc {
-            font-size: 14px;
-            color: #666;
-            margin-top: 5px;
+            font-size: 13px;
+            color: #999;
+            margin-top: 4px;
         }
 
         .modal-body {
-            padding: 25px;
-            max-height: 60vh;
-            overflow-y: auto;
+            padding: 24px;
         }
 
-        .endpoint-url {
+        .modal-footer {
+            border-top: 1px solid #e5e5e5;
+            padding: 16px 24px;
+        }
+
+        .api-endpoint-box {
             background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            font-family: 'Courier New', monospace;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: monospace;
             font-size: 13px;
             color: #2c2c2c;
-            border: 1px solid #e0e0e0;
             word-break: break-all;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         .param-input {
             width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
+            padding: 12px;
+            border: 1px solid #e5e5e5;
+            border-radius: 6px;
             font-size: 14px;
+            margin-bottom: 12px;
+            font-family: 'Poppins', sans-serif;
             transition: all 0.3s ease;
-            margin-bottom: 15px;
         }
 
         .param-input:focus {
             outline: none;
             border-color: #2c2c2c;
-            box-shadow: 0 0 0 4px rgba(44, 44, 44, 0.1);
+            box-shadow: 0 0 0 3px rgba(44,44,44,0.1);
         }
 
         .param-input.is-invalid {
             border-color: #dc3545;
         }
 
-        .param-desc {
-            font-size: 13px;
-            color: #666;
-            margin-top: -10px;
-            margin-bottom: 15px;
-            line-height: 1.6;
-        }
-
-        .response-content {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-            color: #2c2c2c;
-            border: 1px solid #e0e0e0;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .response-content img {
-            max-width: 100%;
-            border-radius: 8px;
-        }
-
-        .modal-footer {
-            border-top: 1px solid #e0e0e0;
-            padding: 20px 25px;
+        .inner-desc {
+            font-size: 12px;
+            color: #999;
+            margin-top: 8px;
+            line-height: 1.5;
         }
 
         .submit-btn {
             background: #2c2c2c;
             color: #ffffff;
             border: none;
-            padding: 12px 32px;
-            border-radius: 8px;
+            padding: 10px 24px;
+            border-radius: 6px;
             font-size: 14px;
             font-weight: 500;
             cursor: pointer;
@@ -564,103 +499,112 @@
 
         .submit-btn:hover {
             background: #1a1a1a;
-            transform: scale(1.05);
         }
 
         .submit-btn:disabled {
-            background: #ccc;
+            opacity: 0.5;
             cursor: not-allowed;
-            transform: none;
+        }
+
+        .response-box {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 13px;
+            color: #2c2c2c;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 16px;
+        }
+
+        .response-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-top: 16px;
         }
 
         /* Footer */
         .footer {
             text-align: center;
             padding: 30px 20px;
-            color: #888;
-            font-size: 14px;
-            border-top: 1px solid #e0e0e0;
-            margin-top: 50px;
+            color: #999;
+            font-size: 13px;
+            border-top: 1px solid #e5e5e5;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Responsive */
         @media (max-width: 768px) {
-            .home-title h1 {
+            .top-links {
+                display: none;
+            }
+
+            .home-title {
                 font-size: 32px;
+            }
+
+            .home-description {
+                font-size: 16px;
             }
 
             .endpoints-grid {
                 grid-template-columns: 1fr;
             }
 
-            .sidebar {
-                width: 100%;
-                right: -100%;
+            .main-content {
+                padding: 20px 15px;
             }
-
-            .nav-links {
-                gap: 10px;
-            }
-        }
-
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #2c2c2c;
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: #1a1a1a;
         }
     </style>
 </head>
 <body>
     <!-- Loading Screen -->
     <div id="loadingScreen">
-        <div class="spinner-wrapper">
-            <div class="spinner-border" role="status">
-                <span class="visually-hidden">Loading...</span>
-            </div>
-            <p style="margin-top: 15px; color: #2c2c2c;">Loading...</p>
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
         </div>
+        <p style="margin-top: 16px; color: #666;">Loading...</p>
     </div>
 
-    <!-- Top Navigation -->
-    <nav class="top-nav">
-        <div class="nav-brand">
-            <span id="navTitle"></span>
-            <span class="status-badge" id="navStatus"></span>
-        </div>
-        <div class="nav-links">
-            <div id="linkButtons"></div>
-            <button class="menu-btn" id="menuBtn">
-                <div class="menu-icon">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <button class="menu-toggle" id="menuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
             </button>
+            <div class="api-name" id="apiName"></div>
         </div>
-    </nav>
+        <div class="top-bar-right">
+            <div class="top-links" id="topLinks"></div>
+        </div>
+    </div>
 
     <!-- Sidebar -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
     <div class="sidebar" id="sidebar">
-        <div class="sidebar-section">
-            <div class="sidebar-title">Navigation</div>
-            <div class="sidebar-item active" data-page="home">🏠 Home</div>
-            <div class="sidebar-item" data-page="all">📋 All Endpoints</div>
-        </div>
-        <div class="sidebar-section" id="categoriesSection">
-            <div class="sidebar-title">Categories</div>
+        <div class="sidebar-nav">
+            <div class="sidebar-item active" data-page="home">Home</div>
+            <div class="sidebar-item" data-page="status">Status</div>
+            <div class="sidebar-category">Categories</div>
+            <div id="categoriesNav"></div>
+            <div class="sidebar-item" data-page="all">All Endpoints</div>
         </div>
     </div>
 
@@ -668,7 +612,9 @@
     <div class="main-content" id="mainContent"></div>
 
     <!-- Footer -->
-    <div class="footer" id="footer"></div>
+    <div class="footer">
+        <p id="footerText"></p>
+    </div>
 
     <!-- Modal -->
     <div class="modal fade" id="apiModal" tabindex="-1">
@@ -682,15 +628,15 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="endpoint-url d-none" id="endpointUrl"></div>
-                    <div id="paramContainer"></div>
-                    <div class="d-flex justify-content-center align-items-center d-none" id="loadingSpinner" style="height: 100px;">
+                    <div class="api-endpoint-box" id="endpointBox" style="display: none;"></div>
+                    <div id="paramsContainer"></div>
+                    <div id="loadingContainer" style="display: none; text-align: center; padding: 40px;">
                         <div class="spinner-border" role="status"></div>
                     </div>
-                    <div class="response-content d-none" id="responseContent"></div>
+                    <div id="responseContainer"></div>
                 </div>
                 <div class="modal-footer">
-                    <button class="submit-btn d-none" id="submitBtn">Submit</button>
+                    <button class="submit-btn" id="submitBtn" style="display: none;">Submit</button>
                 </div>
             </div>
         </div>
@@ -698,217 +644,258 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        let settings = null;
-        let statusData = null;
+        let settings = {};
         let currentPage = 'home';
 
-        // Initialize
         document.addEventListener('DOMContentLoaded', async () => {
+            await loadSettings();
+            initializeUI();
+            renderPage('home');
+            hideLoading();
+        });
+
+        async function loadSettings() {
             try {
-                // Load settings
-                settings = await fetch('/src/settings.json').then(res => res.json());
+                const response = await fetch('/src/settings.json');
+                settings = await response.json();
                 
-                // Set page title
-                document.getElementById('page').textContent = settings.name;
-                document.getElementById('navTitle').textContent = settings.name;
-                document.getElementById('navStatus').textContent = settings.header.status;
+                document.getElementById('pageTitle').textContent = settings.name || 'API';
+                document.getElementById('apiName').textContent = settings.name || 'API';
+                document.getElementById('footerText').textContent = `Created by ${settings.apiSettings?.creator || 'Unknown'}`;
                 
-                // Create link buttons
-                const linkButtons = document.getElementById('linkButtons');
-                settings.links.forEach(link => {
-                    const btn = document.createElement('a');
-                    btn.href = link.url;
-                    btn.target = '_blank';
-                    btn.className = 'link-btn';
-                    btn.innerHTML = '🔗';
-                    btn.title = link.name;
-                    linkButtons.appendChild(btn);
-                });
-
-                // Create category items
-                const categoriesSection = document.getElementById('categoriesSection');
-                settings.categories.forEach(category => {
-                    const item = document.createElement('div');
-                    item.className = 'sidebar-item';
-                    item.dataset.page = 'category';
-                    item.dataset.category = category.name;
-                    item.innerHTML = `📂 ${category.name}`;
-                    categoriesSection.appendChild(item);
-                });
-
-                // Load home page
-                loadPage('home');
-
-                // Sidebar toggle
-                document.getElementById('menuBtn').addEventListener('click', toggleSidebar);
-                document.getElementById('sidebarOverlay').addEventListener('click', toggleSidebar);
-
-                // Sidebar navigation
-                document.querySelectorAll('.sidebar-item').forEach(item => {
-                    item.addEventListener('click', (e) => {
-                        const page = e.target.dataset.page;
-                        const category = e.target.dataset.category;
-                        
-                        document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
-                        e.target.classList.add('active');
-                        
-                        if (page === 'home') {
-                            loadPage('home');
-                        } else if (page === 'all') {
-                            loadPage('all');
-                        } else if (page === 'category') {
-                            loadPage('category', category);
-                        }
-                        
-                        toggleSidebar();
+                // Top links
+                const topLinksContainer = document.getElementById('topLinks');
+                if (settings.links && settings.links.length > 0) {
+                    settings.links.forEach(link => {
+                        const a = document.createElement('a');
+                        a.href = link.url;
+                        a.className = 'top-link';
+                        a.target = '_blank';
+                        a.innerHTML = `
+                            <svg class="link-icon" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
+                                <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
+                            </svg>
+                            ${link.name}
+                        `;
+                        topLinksContainer.appendChild(a);
                     });
-                });
-
-                // Scroll effect
-                window.addEventListener('scroll', () => {
-                    const nav = document.querySelector('.top-nav');
-                    if (window.scrollY > 10) {
-                        nav.classList.add('scrolled');
-                    } else {
-                        nav.classList.remove('scrolled');
-                    }
-                });
-
-                // Hide loading screen
-                setTimeout(() => {
-                    document.getElementById('loadingScreen').style.display = 'none';
-                    document.body.classList.remove('no-scroll');
-                }, 2000);
-
+                }
+                
+                // Categories navigation
+                const categoriesNav = document.getElementById('categoriesNav');
+                if (settings.categories) {
+                    settings.categories.forEach(category => {
+                        const item = document.createElement('div');
+                        item.className = 'sidebar-item';
+                        item.dataset.page = 'category';
+                        item.dataset.category = category.name;
+                        item.textContent = category.name;
+                        categoriesNav.appendChild(item);
+                    });
+                }
             } catch (error) {
                 console.error('Error loading settings:', error);
             }
-        });
+        }
 
-        function toggleSidebar() {
+        function initializeUI() {
+            // Menu toggle
+            const menuToggle = document.getElementById('menuToggle');
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebarOverlay');
-            sidebar.classList.toggle('active');
-            overlay.classList.toggle('active');
+            
+            menuToggle.addEventListener('click', () => {
+                menuToggle.classList.toggle('active');
+                sidebar.classList.toggle('active');
+                overlay.classList.toggle('active');
+            });
+            
+            overlay.addEventListener('click', () => {
+                menuToggle.classList.remove('active');
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+            });
+            
+            // Sidebar navigation
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const page = item.dataset.page;
+                    const category = item.dataset.category;
+                    
+                    document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                    
+                    if (page === 'category') {
+                        renderPage('category', category);
+                    } else {
+                        renderPage(page);
+                    }
+                    
+                    menuToggle.classList.remove('active');
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                });
+            });
+            
+            // Scroll effect
+            window.addEventListener('scroll', () => {
+                const topBar = document.querySelector('.top-bar');
+                if (window.scrollY > 0) {
+                    topBar.classList.add('scrolled');
+                } else {
+                    topBar.classList.remove('scrolled');
+                }
+            });
         }
 
-        async function loadPage(page, category = null) {
+        function renderPage(page, category = null) {
             currentPage = page;
             const content = document.getElementById('mainContent');
-            const footer = document.getElementById('footer');
             
-            footer.innerHTML = `Created by ${settings.apiSettings.creator}`;
-
-            if (page === 'home') {
-                await loadHomePage(content);
-            } else if (page === 'all') {
-                loadAllEndpoints(content);
-            } else if (page === 'category') {
-                loadCategoryEndpoints(content, category);
+            switch (page) {
+                case 'home':
+                    renderHomePage(content);
+                    break;
+                case 'status':
+                    renderStatusPage(content);
+                    break;
+                case 'category':
+                    renderCategoryPage(content, category);
+                    break;
+                case 'all':
+                    renderAllEndpoints(content);
+                    break;
             }
         }
 
-        async function loadHomePage(content) {
-            try {
-                statusData = await fetch('/status').then(res => res.json());
-            } catch (error) {
-                console.error('Error fetching status:', error);
-                statusData = null;
-            }
-
+        function renderHomePage(container) {
             const imageSrc = Array.isArray(settings.header.imageSrc) && settings.header.imageSrc.length > 0
                 ? settings.header.imageSrc[Math.floor(Math.random() * settings.header.imageSrc.length)]
                 : '';
-
-            content.innerHTML = `
+            
+            container.innerHTML = `
                 <div class="home-banner">
-                    ${imageSrc ? `<img src="${imageSrc}" alt="${settings.name}">` : ''}
-                    <div class="home-title">
-                        <h1>${settings.name}</h1>
-                        <span class="version-badge">${settings.version}</span>
-                    </div>
-                    <p class="home-description">${settings.description}</p>
+                    ${imageSrc ? `<img src="${imageSrc}" alt="${settings.name}" style="max-width: ${settings.header.imageSize?.desktop || '40%'}">` : ''}
+                    <h1 class="home-title">${settings.name || 'API'}</h1>
+                    <div class="home-version">${settings.version || 'v1.0'}</div>
+                    <p class="home-description">${settings.description || 'API Documentation'}</p>
                 </div>
-                ${statusData ? `
-                <div class="status-grid">
-                    <div class="status-card">
-                        <div class="status-label">Status</div>
-                        <div class="status-value">${settings.header.status}</div>
-                    </div>
-                    <div class="status-card">
-                        <div class="status-label">Version</div>
-                        <div class="status-value">${settings.version}</div>
-                    </div>
-                    <div class="status-card">
-                        <div class="status-label">Total Requests</div>
-                        <div class="status-value">${statusData.total_requests || 0}</div>
-                    </div>
-                    <div class="status-card">
-                        <div class="status-label">Routes Loaded</div>
-                        <div class="status-value">${statusData.routes_loaded || 0}</div>
-                    </div>
-                    <div class="status-card">
-                        <div class="status-label">Daily Limit</div>
-                        <div class="status-value">${statusData.daily_limit || 'N/A'}</div>
-                    </div>
-                    <div class="status-card">
-                        <div class="status-label">Active Users</div>
-                        <div class="status-value">${statusData.active_users || 0}</div>
-                    </div>
-                    <div class="status-card">
-                        <div class="status-label">API Latency</div>
-                        <div class="status-value">${statusData.api_latency_ms || 0}ms</div>
-                    </div>
-                    <div class="status-card">
-                        <div class="status-label">Uptime</div>
-                        <div class="status-value">${Math.floor((statusData.uptime_seconds || 0) / 3600)}h</div>
-                    </div>
-                </div>
-                ` : ''}
             `;
         }
 
-        function loadAllEndpoints(content) {
-            const allItems = settings.categories.flatMap(cat => 
-                cat.items.map(item => ({ ...item, category: cat.name }))
-            ).sort((a, b) => a.name.localeCompare(b.name));
-
-            content.innerHTML = `
-                <div class="search-box">
-                    <input type="text" class="search-input" id="searchInput" placeholder="Search endpoints...">
-                    <span class="search-icon">🔍</span>
-                </div>
-                <div class="category-section">
-                    <h2 class="category-title">All Endpoints</h2>
-                    <div class="endpoints-grid" id="endpointsGrid">
-                        ${allItems.map(item => createEndpointCard(item)).join('')}
+        async function renderStatusPage(container) {
+            container.innerHTML = '<div style="text-align: center; padding: 40px;"><div class="spinner-border"></div></div>';
+            
+            try {
+                const response = await fetch('/status');
+                const data = await response.json();
+                
+                container.innerHTML = `
+                    <h2 style="font-size: 28px; font-weight: 600; margin-bottom: 30px;">API Status</h2>
+                    <div class="status-grid">
+                        <div class="status-card">
+                            <div class="status-card-title">Status</div>
+                            <div class="status-card-value" style="color: #28a745;">Online</div>
+                        </div>
+                        <div class="status-card">
+                            <div class="status-card-title">Version</div>
+                            <div class="status-card-value">${settings.version || 'N/A'}</div>
+                        </div>
+                        <div class="status-card">
+                            <div class="status-card-title">Total Requests</div>
+                            <div class="status-card-value">${data.total_requests || 0}</div>
+                        </div>
+                        <div class="status-card">
+                            <div class="status-card-title">Active Users</div>
+                            <div class="status-card-value">${data.active_users || 0}</div>
+                        </div>
+                        <div class="status-card">
+                            <div class="status-card-title">Daily Limit</div>
+                            <div class="status-card-value">${data.daily_limit || 'N/A'}</div>
+                        </div>
+                        <div class="status-card">
+                            <div class="status-card-title">Routes Loaded</div>
+                            <div class="status-card-value">${data.routes_loaded || 0}</div>
+                        </div>
+                        <div class="status-card">
+                            <div class="status-card-title">Uptime</div>
+                            <div class="status-card-value">${formatUptime(data.uptime_seconds)}</div>
+                        </div>
+                        <div class="status-card">
+                            <div class="status-card-title">API Latency</div>
+                            <div class="status-card-value">${data.api_latency_ms || 0}ms</div>
+                        </div>
+                        <div class="status-card">
+                            <div class="status-card-title">CPU Cores</div>
+                            <div class="status-card-value">${data.system?.cores || 'N/A'}</div>
+                            <div class="status-card-small">${data.system?.cpu_model || ''}</div>
+                        </div>
+                        <div class="status-card">
+                            <div class="status-card-title">CPU Load</div>
+                            <div class="status-card-value">${data.system?.cpu_load_percent || 0}%</div>
+                        </div>
+                        <div class="status-card">
+                            <div class="status-card-title">RAM Usage</div>
+                            <div class="status-card-value">${data.system?.ram_used_gb || 0} GB</div>
+                            <div class="status-card-small">of ${data.system?.ram_total_gb || 0} GB</div>
+                        </div>
+                        <div class="status-card">
+                            <div class="status-card-title">Disk Usage</div>
+                            <div class="status-card-value">${data.system?.disk_used_gb || 0} GB</div>
+                            <div class="status-card-small">of ${data.system?.disk_total_gb || 0} GB</div>
+                        </div>
                     </div>
-                </div>
-            `;
-
-            setupSearch();
-            setupEndpointButtons();
+                `;
+            } catch (error) {
+                container.innerHTML = '<p style="text-align: center; color: #dc3545;">Failed to load status</p>';
+            }
         }
 
-        function loadCategoryEndpoints(content, categoryName) {
-            const category = settings.categories.find(cat => cat.name === categoryName);
+        function renderCategoryPage(container, categoryName) {
+            const category = settings.categories.find(c => c.name === categoryName);
             if (!category) return;
-
+            
             const sortedItems = [...category.items].sort((a, b) => a.name.localeCompare(b.name));
-
-            content.innerHTML = `
+            
+            container.innerHTML = `
                 <div class="search-box">
-                    <input type="text" class="search-input" id="searchInput" placeholder="Search in ${categoryName}...">
-                    <span class="search-icon">🔍</span>
+                    <input type="text" class="search-input" placeholder="Search endpoints..." id="searchInput">
                 </div>
                 <div class="category-section">
-                    <h2 class="category-title">${categoryName}</h2>
+                    <h2 class="category-title">${category.name}</h2>
                     <div class="endpoints-grid" id="endpointsGrid">
                         ${sortedItems.map(item => createEndpointCard(item)).join('')}
                     </div>
                 </div>
             `;
+            
+            setupSearch();
+            setupEndpointButtons();
+        }
 
+        function renderAllEndpoints(container) {
+            container.innerHTML = `
+                <div class="search-box">
+                    <input type="text" class="search-input" placeholder="Search endpoints..." id="searchInput">
+                </div>
+                <div id="allCategories"></div>
+            `;
+            
+            const allCategories = document.getElementById('allCategories');
+            settings.categories.forEach(category => {
+                const sortedItems = [...category.items].sort((a, b) => a.name.localeCompare(b.name));
+                
+                allCategories.innerHTML += `
+                    <div class="category-section" data-category="${category.name}">
+                        <h2 class="category-title">${category.name}</h2>
+                        <div class="endpoints-grid">
+                            ${sortedItems.map(item => createEndpointCard(item)).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            
             setupSearch();
             setupEndpointButtons();
         }
@@ -917,14 +904,10 @@
             return `
                 <div class="endpoint-card" data-name="${item.name.toLowerCase()}" data-desc="${item.desc.toLowerCase()}">
                     <div class="endpoint-info">
-                        <h5>${item.name}</h5>
-                        <p>${item.desc}</p>
+                        <div class="endpoint-name">${item.name}</div>
+                        <div class="endpoint-desc">${item.desc}</div>
                     </div>
-                    <button class="get-btn" 
-                        data-path="${item.path}" 
-                        data-name="${item.name}" 
-                        data-desc="${item.desc}"
-                        data-inner-desc="${item.innerDesc || ''}">
+                    <button class="endpoint-btn" data-path="${item.path}" data-name="${item.name}" data-desc="${item.desc}" data-inner-desc="${item.innerDesc || ''}">
                         GET
                     </button>
                 </div>
@@ -933,143 +916,180 @@
 
         function setupSearch() {
             const searchInput = document.getElementById('searchInput');
-            searchInput?.addEventListener('input', (e) => {
+            if (!searchInput) return;
+            
+            searchInput.addEventListener('input', (e) => {
                 const term = e.target.value.toLowerCase();
                 const cards = document.querySelectorAll('.endpoint-card');
+                const sections = document.querySelectorAll('.category-section');
                 
                 cards.forEach(card => {
                     const name = card.dataset.name;
                     const desc = card.dataset.desc;
-                    card.style.display = (name.includes(term) || desc.includes(term)) ? '' : 'none';
+                    const matches = name.includes(term) || desc.includes(term);
+                    card.style.display = matches ? '' : 'none';
+                });
+                
+                sections.forEach(section => {
+                    const visibleCards = section.querySelectorAll('.endpoint-card:not([style*="display: none"])');
+                    section.style.display = visibleCards.length > 0 ? '' : 'none';
                 });
             });
         }
 
         function setupEndpointButtons() {
-            document.querySelectorAll('.get-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const { path, name, desc, innerDesc } = e.target.dataset;
-                    openApiModal(path, name, desc, innerDesc);
+            document.querySelectorAll('.endpoint-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const path = btn.dataset.path;
+                    const name = btn.dataset.name;
+                    const desc = btn.dataset.desc;
+                    const innerDesc = btn.dataset.innerDesc;
+                    
+                    openModal(path, name, desc, innerDesc);
                 });
             });
         }
 
-        function openApiModal(path, name, desc, innerDesc) {
+        function openModal(path, name, desc, innerDesc) {
             const modal = new bootstrap.Modal(document.getElementById('apiModal'));
-            const modalTitle = document.getElementById('modalTitle');
-            const modalDesc = document.getElementById('modalDesc');
-            const endpointUrl = document.getElementById('endpointUrl');
-            const paramContainer = document.getElementById('paramContainer');
-            const submitBtn = document.getElementById('submitBtn');
-            const responseContent = document.getElementById('responseContent');
-            const loadingSpinner = document.getElementById('loadingSpinner');
-
-            modalTitle.textContent = name;
-            modalDesc.textContent = desc;
-            endpointUrl.textContent = '';
-            endpointUrl.classList.add('d-none');
-            paramContainer.innerHTML = '';
-            submitBtn.classList.add('d-none');
-            responseContent.classList.add('d-none');
-            responseContent.innerHTML = '';
-            loadingSpinner.classList.add('d-none');
-
-            const baseUrl = `${window.location.origin}${path}`;
-            const params = new URLSearchParams(path.split('?')[1]);
-            const hasParams = params.toString().length > 0;
-
+            
+            document.getElementById('modalTitle').textContent = name;
+            document.getElementById('modalDesc').textContent = desc;
+            document.getElementById('endpointBox').style.display = 'none';
+            document.getElementById('paramsContainer').innerHTML = '';
+            document.getElementById('responseContainer').innerHTML = '';
+            document.getElementById('submitBtn').style.display = 'none';
+            
+            const baseUrl = window.location.origin + path;
+            const urlParts = path.split('?');
+            const params = new URLSearchParams(urlParts[1] || '');
+            const hasParams = Array.from(params.keys()).length > 0;
+            
             if (hasParams) {
-                const paramsArray = Array.from(params.keys());
+                const paramsContainer = document.getElementById('paramsContainer');
                 
-                paramsArray.forEach(param => {
+                Array.from(params.keys()).forEach(param => {
                     const input = document.createElement('input');
                     input.type = 'text';
                     input.className = 'param-input';
                     input.placeholder = `Enter ${param}...`;
                     input.dataset.param = param;
                     input.required = true;
-                    paramContainer.appendChild(input);
+                    paramsContainer.appendChild(input);
                 });
-
+                
                 if (innerDesc) {
                     const descDiv = document.createElement('div');
-                    descDiv.className = 'param-desc';
+                    descDiv.className = 'inner-desc';
                     descDiv.innerHTML = innerDesc.replace(/\n/g, '<br>');
-                    paramContainer.appendChild(descDiv);
+                    paramsContainer.appendChild(descDiv);
                 }
-
-                submitBtn.classList.remove('d-none');
-                submitBtn.onclick = () => handleApiRequest(path, modalTitle, endpointUrl, paramContainer, submitBtn, responseContent, loadingSpinner);
+                
+                const submitBtn = document.getElementById('submitBtn');
+                submitBtn.style.display = 'block';
+                submitBtn.disabled = true;
+                
+                paramsContainer.querySelectorAll('.param-input').forEach(input => {
+                    input.addEventListener('input', () => {
+                        const allInputs = paramsContainer.querySelectorAll('.param-input');
+                        const allFilled = Array.from(allInputs).every(inp => inp.value.trim() !== '');
+                        submitBtn.disabled = !allFilled;
+                    });
+                });
+                
+                submitBtn.onclick = () => {
+                    const inputs = paramsContainer.querySelectorAll('.param-input');
+                    const newParams = new URLSearchParams();
+                    let isValid = true;
+                    
+                    inputs.forEach(input => {
+                        if (!input.value.trim()) {
+                            isValid = false;
+                            input.classList.add('is-invalid');
+                        } else {
+                            input.classList.remove('is-invalid');
+                            newParams.append(input.dataset.param, input.value.trim());
+                        }
+                    });
+                    
+                    if (!isValid) return;
+                    
+                    const fullUrl = `${window.location.origin}${urlParts[0]}?${newParams.toString()}`;
+                    paramsContainer.innerHTML = '';
+                    submitBtn.style.display = 'none';
+                    makeApiRequest(fullUrl);
+                };
             } else {
-                handleApiRequest(path, modalTitle, endpointUrl, paramContainer, submitBtn, responseContent, loadingSpinner);
+                makeApiRequest(baseUrl);
             }
-
+            
             modal.show();
         }
 
-        async function handleApiRequest(path, modalTitle, endpointUrl, paramContainer, submitBtn, responseContent, loadingSpinner) {
-            const inputs = paramContainer.querySelectorAll('input');
-            let isValid = true;
-            const newParams = new URLSearchParams();
-
-            inputs.forEach(input => {
-                if (!input.value.trim()) {
-                    isValid = false;
-                    input.classList.add('is-invalid');
-                } else {
-                    input.classList.remove('is-invalid');
-                    newParams.append(input.dataset.param, input.value.trim());
-                }
-            });
-
-            if (!isValid && inputs.length > 0) {
-                responseContent.textContent = 'Please fill in all required fields.';
-                responseContent.classList.remove('d-none');
-                return;
-            }
-
-            const apiUrl = inputs.length > 0 
-                ? `${window.location.origin}${path.split('?')[0]}?${newParams.toString()}`
-                : `${window.location.origin}${path}`;
-
-            paramContainer.innerHTML = '';
-            submitBtn.classList.add('d-none');
-            loadingSpinner.classList.remove('d-none');
-            responseContent.classList.add('d-none');
-            endpointUrl.classList.add('d-none');
-
+        async function makeApiRequest(url) {
+            const endpointBox = document.getElementById('endpointBox');
+            const loadingContainer = document.getElementById('loadingContainer');
+            const responseContainer = document.getElementById('responseContainer');
+            
+            endpointBox.textContent = url;
+            endpointBox.style.display = 'block';
+            loadingContainer.style.display = 'block';
+            responseContainer.innerHTML = '';
+            
             try {
-                const response = await fetch(apiUrl);
-
+                const response = await fetch(url);
+                
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-
+                
                 const contentType = response.headers.get('Content-Type');
                 
                 if (contentType && contentType.startsWith('image/')) {
                     const blob = await response.blob();
                     const imageUrl = URL.createObjectURL(blob);
+                    
                     const img = document.createElement('img');
                     img.src = imageUrl;
-                    img.alt = modalTitle.textContent;
-                    img.style.maxWidth = '100%';
-                    img.style.borderRadius = '8px';
-                    responseContent.innerHTML = '';
-                    responseContent.appendChild(img);
+                    img.className = 'response-image';
+                    responseContainer.appendChild(img);
                 } else {
                     const data = await response.json();
-                    responseContent.textContent = JSON.stringify(data, null, 2);
+                    const pre = document.createElement('pre');
+                    pre.className = 'response-box';
+                    pre.textContent = JSON.stringify(data, null, 2);
+                    responseContainer.appendChild(pre);
                 }
-
-                endpointUrl.textContent = apiUrl;
-                endpointUrl.classList.remove('d-none');
             } catch (error) {
-                responseContent.textContent = `Error: ${error.message}`;
+                const pre = document.createElement('pre');
+                pre.className = 'response-box';
+                pre.textContent = `Error: ${error.message}`;
+                pre.style.color = '#dc3545';
+                responseContainer.appendChild(pre);
             } finally {
-                loadingSpinner.classList.add('d-none');
-                responseContent.classList.remove('d-none');
+                loadingContainer.style.display = 'none';
             }
+        }
+
+        function formatUptime(seconds) {
+            if (!seconds) return 'N/A';
+            
+            const days = Math.floor(seconds / 86400);
+            const hours = Math.floor((seconds % 86400) / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            
+            if (days > 0) return `${days}d ${hours}h`;
+            if (hours > 0) return `${hours}h ${minutes}m`;
+            return `${minutes}m`;
+        }
+
+        function hideLoading() {
+            const loadingScreen = document.getElementById('loadingScreen');
+            loadingScreen.classList.add('fade-out');
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+                document.body.classList.remove('no-scroll');
+            }, 500);
         }
     </script>
 </body>
