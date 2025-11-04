@@ -9,7 +9,6 @@ const PORT = process.env.PORT || 10005;
 
 app.enable("trust proxy");
 app.set("json spaces", 2);
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
@@ -18,6 +17,30 @@ app.use('/src', express.static(path.join(__dirname, 'src')));
 
 const settingsPath = path.join(__dirname, './src/settings.json');
 const settings = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
+
+let requestCount = 0;
+const apiStartTime = Date.now();
+const userRequests = {};
+
+app.use((req, res, next) => {
+    const ip = req.ip;
+    const currentDate = new Date().toISOString().split('T')[0];
+    if (!userRequests[ip]) userRequests[ip] = {};
+    if (userRequests[ip].date !== currentDate) {
+        userRequests[ip].date = currentDate;
+        userRequests[ip].count = 0;
+    }
+    if (userRequests[ip].count >= parseInt(settings.apiSettings.limit)) {
+        return res.status(429).json({
+            status: 429,
+            message: "Daily request limit reached",
+            creator: settings.apiSettings.creator
+        });
+    }
+    userRequests[ip].count++;
+    requestCount++;
+    next();
+});
 
 app.use((req, res, next) => {
     const originalJson = res.json;
@@ -35,7 +58,6 @@ app.use((req, res, next) => {
     next();
 });
 
-// Api Route
 let totalRoutes = 0;
 const apiFolder = path.join(__dirname, './src/api');
 fs.readdirSync(apiFolder).forEach((subfolder) => {
@@ -51,8 +73,22 @@ fs.readdirSync(apiFolder).forEach((subfolder) => {
         });
     }
 });
+
 console.log(chalk.bgHex('#90EE90').hex('#333').bold(' Load Complete! ✓ '));
 console.log(chalk.bgHex('#90EE90').hex('#333').bold(` Total Routes Loaded: ${totalRoutes} `));
+
+app.get('/status', (req, res) => {
+    const uptime = ((Date.now() - apiStartTime) / 1000).toFixed(0);
+    res.json({
+        creator: settings.apiSettings.creator,
+        uptime: `${uptime}s`,
+        total_requests: requestCount,
+        routes_loaded: totalRoutes,
+        daily_limit: settings.apiSettings.limit,
+        active_users: Object.keys(userRequests).length,
+        current_date: new Date().toISOString()
+    });
+});
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'api-page', 'index.html'));
