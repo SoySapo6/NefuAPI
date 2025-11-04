@@ -4,7 +4,9 @@ const fs = require('fs');
 const cors = require('cors');
 const path = require('path');
 const os = require('os');
-const axios = require('axios');
+const { exec } = require('child_process');
+const fetch = require('node-fetch'); // you need npm install node-fetch
+const disk = require('diskusage'); // you need npm install diskusage
 
 const app = express();
 const PORT = process.env.PORT || 10005;
@@ -25,7 +27,7 @@ const apiStartTime = Date.now();
 const userRequests = {};
 
 app.use((req, res, next) => {
-  const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.ip;
+  const ip = req.ip;
   const currentDate = new Date().toISOString().split('T')[0];
   if (!userRequests[ip]) userRequests[ip] = {};
   if (userRequests[ip].date !== currentDate) {
@@ -44,101 +46,86 @@ app.use((req, res, next) => {
   next();
 });
 
-let totalRoutes = 0;
-const apiFolder = path.join(__dirname, './src/api');
-fs.readdirSync(apiFolder).forEach((subfolder) => {
-  const subfolderPath = path.join(apiFolder, subfolder);
-  if (fs.statSync(subfolderPath).isDirectory()) {
-    fs.readdirSync(subfolderPath).forEach((file) => {
-      const filePath = path.join(subfolderPath, file);
-      if (path.extname(file) === '.js') {
-        require(filePath)(app);
-        totalRoutes++;
-        console.log(chalk.bgHex('#FFFF99').hex('#333').bold(` Loaded Route: ${path.basename(file)} `));
-      }
-    });
-  }
+app.use((req, res, next) => {
+  const startTime = process.hrtime();
+  const originalJson = res.json;
+  res.json = function(data) {
+    const diff = process.hrtime(startTime);
+    const latencyMs = diff[0] * 1000 + diff[1] / 1e6;
+    if (data && typeof data === 'object') {
+      data.api_latency_ms = latencyMs.toFixed(3);
+    }
+    return originalJson.call(this, data);
+  };
+  next();
 });
 
-console.log(chalk.bgHex('#90EE90').hex('#333').bold(' Load Complete! ✓ '));
-console.log(chalk.bgHex('#90EE90').hex('#333').bold(` Total Routes Loaded: ${totalRoutes} `));
-
 app.get('/status', async (req, res) => {
-  const ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.ip;
-  let geo = {};
   try {
-    const response = await axios.get(`https://ipapi.co/${ip.replace('::ffff:', '')}/json/`);
-    geo = response.data;
-  } catch {
-    geo = { error: true, message: "Could not fetch geolocation" };
+    const ip = req.ip;
+    const geoRes = await fetch(`https://ipapi.co/${ip}/json/`); // example geo API
+    const geo = await geoRes.json().catch(() => ({}));
+
+    const cpus = os.cpus();
+    const cpuModel = cpus[0].model;
+    const cores = cpus.length;
+    const speed = cpus[0].speed;
+    const totalRam = os.totalmem();
+    const freeRam = os.freemem();
+
+    let diskInfo = {};
+    try {
+      const { available, free, total } = await disk.check(os.platform() === 'win32' ? 'c:' : '/');
+      diskInfo = { total, free, available };
+    } catch (err) {
+      diskInfo = { error: "disk usage not available" };
+    }
+
+    let temp = "not available";
+    if (os.platform() === 'linux') {
+      try {
+        const out = await new Promise((resolve, reject) => {
+          exec("cat /sys/class/thermal/thermal_zone0/temp", (err, stdout) => {
+            if (err) return reject(err);
+            resolve(stdout);
+          });
+        });
+        temp = (parseInt(out) / 1000) + "°C";
+      } catch(e) {
+        temp = "error reading temperature";
+      }
+    }
+
+    const uptimeSeconds = (Date.now() - apiStartTime) / 1000;
+
+    res.json({
+      creator: settings.apiSettings.creator,
+      uptime_seconds: uptimeSeconds.toFixed(0),
+      total_requests: requestCount,
+      routes_loaded: Object.keys(require.cache).length, // or your totalRoutes variable
+      daily_limit: settings.apiSettings.limit,
+      active_users: Object.keys(userRequests).length,
+      current_date: new Date().toISOString(),
+
+      user_ip: ip,
+      user_geo: geo,
+
+      system: {
+        hostname: os.hostname(),
+        platform: os.platform(),
+        arch: os.arch(),
+        cpu_model: cpuModel,
+        cores: cores,
+        cpu_speed_mhz: speed,
+        ram_total_bytes: totalRam,
+        ram_free_bytes: freeRam,
+        disk: diskInfo,
+        cpu_temperature: temp
+      }
+    });
+  } catch(e) {
+    res.status(500).json({ status: 500, message: "Error gathering status data", error: e.toString() });
   }
-
-  const uptime = ((Date.now() - apiStartTime) / 1000).toFixed(0);
-  const totalMem = os.totalmem() / 1024 / 1024 / 1024;
-  const freeMem = os.freemem() / 1024 / 1024 / 1024;
-  const usedMem = totalMem - freeMem;
-  const cpus = os.cpus();
-  const cpuModel = cpus[0]?.model || "Unknown";
-  const cpuSpeed = cpus[0]?.speed || 0;
-  const cpuUsage = (os.loadavg()[0] / os.cpus().length * 100).toFixed(2);
-
-  const disks = fs.existsSync('/proc/mounts') ? fs.readFileSync('/proc/mounts', 'utf-8')
-    .split('\n')
-    .filter(Boolean)
-    .map(line => line.split(' ')[1])
-    .filter(p => p.startsWith('/'))
-    : [];
-
-  const systemInfo = {
-    hostname: os.hostname(),
-    platform: os.platform(),
-    arch: os.arch(),
-    os_release: os.release(),
-    node_version: process.version,
-    cpu_model: cpuModel,
-    cpu_speed_mhz: cpuSpeed,
-    cpu_cores: cpus.length,
-    cpu_load_percent: `${cpuUsage}%`,
-    ram_total_gb: totalMem.toFixed(2),
-    ram_used_gb: usedMem.toFixed(2),
-    ram_free_gb: freeMem.toFixed(2),
-    uptime_os_seconds: os.uptime(),
-    home_dir: os.homedir(),
-    temp_dir: os.tmpdir(),
-    load_average: os.loadavg(),
-    network_interfaces: os.networkInterfaces(),
-    mounted_drives: disks
-  };
-
-  const processInfo = {
-    pid: process.pid,
-    uptime_seconds: process.uptime().toFixed(0),
-    memory_mb: (process.memoryUsage().rss / 1024 / 1024).toFixed(2),
-    node_exec_path: process.execPath,
-    cwd: process.cwd(),
-    platform: process.platform,
-    argv: process.argv,
-    env_vars_count: Object.keys(process.env).length
-  };
-
-  const response = {
-    status: 200,
-    creator: settings.apiSettings.creator,
-    api_uptime_seconds: uptime,
-    total_requests: requestCount,
-    routes_loaded: totalRoutes,
-    daily_limit: settings.apiSettings.limit,
-    active_users: Object.keys(userRequests).length,
-    current_date: new Date().toISOString(),
-    user_info: {
-      ip,
-      geo
-    },
-    system_info: systemInfo,
-    process_info: processInfo
-  };
-
-  res.json(response);
 });
 
 app.get('/', (req, res) => {
