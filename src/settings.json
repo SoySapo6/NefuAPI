@@ -5,7 +5,7 @@
   "header": {
     "status": "OK",
     "imageSrc": [
-      "https://files.catbox.moe/2334g9.png"
+      "https://files.catbox.moe/wg9ysl.png"
     ],
     "imageSize": {
       "mobile": "80%",
@@ -14,16 +14,16 @@
     }
   },
   "apiSettings": {
-    "creator": "Rynn"
+    "creator": "SoyMaycol"
   },
   "links": [
     {
       "name": "Source Code",
-      "url": "https://github.com/rynxzyy/Rynn-UI"
+      "url": "https://github.com/SoySapo6/NefuAPI/"
     },
     {
       "name": "Contact Me",
-      "url": "https://wa.me/6285173370004"
+      "url": "https://wa.me/51921826291"
     }
   ],
   "categories": [
