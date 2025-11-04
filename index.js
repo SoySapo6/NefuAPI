@@ -4,9 +4,8 @@ const fs = require('fs');
 const cors = require('cors');
 const path = require('path');
 const os = require('os');
-const { exec } = require('child_process');
-const fetch = require('node-fetch'); // you need npm install node-fetch
-const disk = require('diskusage'); // you need npm install diskusage
+const si = require('systeminformation');
+const axios = require('axios');
 
 const app = express();
 const PORT = process.env.PORT || 10005;
@@ -27,11 +26,11 @@ const apiStartTime = Date.now();
 const userRequests = {};
 
 app.use((req, res, next) => {
-  const ip = req.ip;
-  const currentDate = new Date().toISOString().split('T')[0];
-  if (!userRequests[ip]) userRequests[ip] = {};
-  if (userRequests[ip].date !== currentDate) {
-    userRequests[ip].date = currentDate;
+  const ip = req.ip.replace('::ffff:', '');
+  const today = new Date().toISOString().split('T')[0];
+  if (!userRequests[ip]) userRequests[ip] = { date: today, count: 0 };
+  if (userRequests[ip].date !== today) {
+    userRequests[ip].date = today;
     userRequests[ip].count = 0;
   }
   if (userRequests[ip].count >= parseInt(settings.apiSettings.limit)) {
@@ -46,93 +45,98 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use((req, res, next) => {
-  const startTime = process.hrtime();
-  const originalJson = res.json;
-  res.json = function(data) {
-    const diff = process.hrtime(startTime);
-    const latencyMs = diff[0] * 1000 + diff[1] / 1e6;
-    if (data && typeof data === 'object') {
-      data.api_latency_ms = latencyMs.toFixed(3);
-    }
-    return originalJson.call(this, data);
-  };
-  next();
-});
-
-app.get('/status', async (req, res) => {
-  try {
-    const ip = req.ip;
-    const geoRes = await fetch(`https://ipapi.co/${ip}/json/`); // example geo API
-    const geo = await geoRes.json().catch(() => ({}));
-
-    const cpus = os.cpus();
-    const cpuModel = cpus[0].model;
-    const cores = cpus.length;
-    const speed = cpus[0].speed;
-    const totalRam = os.totalmem();
-    const freeRam = os.freemem();
-
-    let diskInfo = {};
-    try {
-      const { available, free, total } = await disk.check(os.platform() === 'win32' ? 'c:' : '/');
-      diskInfo = { total, free, available };
-    } catch (err) {
-      diskInfo = { error: "disk usage not available" };
-    }
-
-    let temp = "not available";
-    if (os.platform() === 'linux') {
-      try {
-        const out = await new Promise((resolve, reject) => {
-          exec("cat /sys/class/thermal/thermal_zone0/temp", (err, stdout) => {
-            if (err) return reject(err);
-            resolve(stdout);
-          });
-        });
-        temp = (parseInt(out) / 1000) + "°C";
-      } catch(e) {
-        temp = "error reading temperature";
-      }
-    }
-
-    const uptimeSeconds = (Date.now() - apiStartTime) / 1000;
-
-    res.json({
-      creator: settings.apiSettings.creator,
-      uptime_seconds: uptimeSeconds.toFixed(0),
-      total_requests: requestCount,
-      routes_loaded: Object.keys(require.cache).length, // or your totalRoutes variable
-      daily_limit: settings.apiSettings.limit,
-      active_users: Object.keys(userRequests).length,
-      current_date: new Date().toISOString(),
-
-      user_ip: ip,
-      user_geo: geo,
-
-      system: {
-        hostname: os.hostname(),
-        platform: os.platform(),
-        arch: os.arch(),
-        cpu_model: cpuModel,
-        cores: cores,
-        cpu_speed_mhz: speed,
-        ram_total_bytes: totalRam,
-        ram_free_bytes: freeRam,
-        disk: diskInfo,
-        cpu_temperature: temp
+let totalRoutes = 0;
+const apiFolder = path.join(__dirname, './src/api');
+fs.readdirSync(apiFolder).forEach((subfolder) => {
+  const subfolderPath = path.join(apiFolder, subfolder);
+  if (fs.statSync(subfolderPath).isDirectory()) {
+    fs.readdirSync(subfolderPath).forEach((file) => {
+      const filePath = path.join(subfolderPath, file);
+      if (path.extname(file) === '.js') {
+        require(filePath)(app);
+        totalRoutes++;
+        console.log(chalk.bgHex('#FFFF99').hex('#333').bold(` Loaded Route: ${path.basename(file)} `));
       }
     });
-  } catch(e) {
-    res.status(500).json({ status: 500, message: "Error gathering status data", error: e.toString() });
   }
+});
+
+console.log(chalk.bgHex('#90EE90').hex('#333').bold(' Load Complete! ✓ '));
+console.log(chalk.bgHex('#90EE90').hex('#333').bold(` Total Routes Loaded: ${totalRoutes} `));
+
+app.get('/status', async (req, res) => {
+  const start = Date.now();
+  const ip = req.headers['x-forwarded-for']?.split(',')[0] || req.ip.replace('::ffff:', '');
+  const uptimeSec = ((Date.now() - apiStartTime) / 1000).toFixed(0);
+
+  let geo = {};
+  try {
+    const { data } = await axios.get(`https://ipwho.is/${ip}`);
+    geo = {
+      ip: data.ip,
+      country: data.country,
+      region: data.region,
+      city: data.city,
+      latitude: data.latitude,
+      longitude: data.longitude,
+      timezone: data.timezone?.id,
+      isp: data.connection?.isp,
+      continent: data.continent,
+      currency: data.currency?.code
+    };
+  } catch {
+    geo = { error: true };
+  }
+
+  const mem = await si.mem();
+  const cpu = await si.cpu();
+  const osInfo = await si.osInfo();
+  const disk = await si.fsSize();
+  const temp = await si.cpuTemperature();
+
+  const sys = {
+    hostname: os.hostname(),
+    platform: os.platform(),
+    arch: os.arch(),
+    distro: osInfo.distro,
+    release: osInfo.release,
+    kernel: osInfo.kernel,
+    uptime_seconds: os.uptime(),
+    cpu_model: cpu.manufacturer + ' ' + cpu.brand,
+    cores: cpu.cores,
+    cpu_speed_ghz: cpu.speed,
+    cpu_temperature_celsius: temp.main || 0,
+    ram_total_gb: (mem.total / 1024 / 1024 / 1024).toFixed(2),
+    ram_used_gb: ((mem.total - mem.available) / 1024 / 1024 / 1024).toFixed(2),
+    ram_free_gb: (mem.available / 1024 / 1024 / 1024).toFixed(2),
+    disk_total_gb: (disk[0]?.size / 1024 / 1024 / 1024).toFixed(2),
+    disk_used_gb: (disk[0]?.used / 1024 / 1024 / 1024).toFixed(2),
+    disk_free_gb: (disk[0]?.available / 1024 / 1024 / 1024).toFixed(2),
+    cpu_usage_percent: (await si.currentLoad()).currentload.toFixed(2)
+  };
+
+  const latency = (Date.now() - start).toFixed(2);
+
+  res.json({
+    creator: settings.apiSettings.creator,
+    uptime_seconds: uptimeSec,
+    total_requests: requestCount,
+    routes_loaded: totalRoutes,
+    daily_limit: settings.apiSettings.limit,
+    active_users: Object.keys(userRequests).length,
+    current_date: new Date().toISOString(),
+    user_ip: ip,
+    user_geo: geo,
+    system: sys,
+    api_latency_ms: latency
+  });
 });
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'api-page', 'index.html'));
 });
 
-app.use((req, res, next) => {
+app.use((req, res) => {
   res.status(404).sendFile(process.cwd() + "/api-page/404.html");
 });
 
